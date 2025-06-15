@@ -46,7 +46,7 @@ class Light:
             self.state["colortemp"] = max(2500, min(6500, self.state["colortemp"] + random.randint(-200, 200)))
         self.state["brightness"] = max(0, min(100, self.state["brightness"] + random.randint(-5, 5)))
 
-    def publish_discovery(self):
+    async def publish_discovery(self):
         topic = f"homeassistant/light/{self.pid}/{self.did}/config"
         payload = {
             "unique_id": self.did,
@@ -87,8 +87,8 @@ class Light:
         }
         await self.mqtt.publish(topic, payload, retain=True)
 
-    def publish_status(self):
+    async def publish_status(self):
         await self.mqtt.publish(f"home/{self.did}/status", self.state)
 
-    def publish_availability(self, status):
+    async def publish_availability(self, status):
         await self.mqtt.publish(f"home/{self.did}/available", status)
