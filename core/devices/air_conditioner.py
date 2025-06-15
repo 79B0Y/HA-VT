@@ -41,7 +41,7 @@ class AirConditioner:
         # 简单模拟状态变化
         self.state["envtemp"] = round(self.state["envtemp"] + random.uniform(-0.5, 0.5), 1)
 
-    def publish_discovery(self):
+    async def publish_discovery(self):
         topic = f"homeassistant/climate/{self.pid}/{self.did}/config"
         payload = {
             "name": self.name,
@@ -76,8 +76,8 @@ class AirConditioner:
         }
         await    self.mqtt.publish(topic, payload, retain=True)
 
-    def publish_status(self):
+    async def publish_status(self):
         await    self.mqtt.publish(f"home/{self.did}/status", self.state)
 
-    def publish_availability(self, status):
+    async def publish_availability(self, status):
         await    self.mqtt.publish(f"home/{self.did}/available", status)
