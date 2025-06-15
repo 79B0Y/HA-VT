@@ -28,6 +28,11 @@ virtual-device-simulator/
 │   │   ├── assets/             # 图标、图片等
 │   │   ├── components/         # 公共组件（卡片、状态块）
 │   │   ├── pages/              # 页面（首页、设备总览、日志）
+│   │   ├── pages/ 
+│   │   │    ├── Dashboard.vue 
+│   │   │    ├── Devices.vue
+│   │   │    ├── Logs.vue
+│   │   │    ├── MongoStats.vue
 │   │   ├── store/              # Pinia 状态管理
 │   │   ├── utils/              # 工具函数与接口封装
 │   │   ├── App.vue
