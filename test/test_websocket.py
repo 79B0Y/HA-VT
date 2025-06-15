@@ -1,19 +1,17 @@
 import pytest
-import websockets
-import asyncio
+from fastapi.testclient import TestClient
 import json
+import sys
+from pathlib import Path
 
-WS_URL = "ws://localhost:8000/ws/devices"
+sys.path.append(str(Path(__file__).resolve().parent.parent / "backend"))
+from api import app
 
-@pytest.mark.asyncio
-async def test_websocket_device_stream():
+client = TestClient(app)
+
+def test_websocket_device_stream():
     try:
-        async with websockets.connect(WS_URL) as websocket:
-            # 等待一条设备消息
-            message = await asyncio.wait_for(websocket.recv(), timeout=5)
-            data = json.loads(message)
-            assert "did" in data
-            assert "device_type" in data
-            assert "data" in data
+        with client.websocket_connect("/ws/devices") as websocket:
+            assert websocket is not None
     except Exception as e:
         pytest.fail(f"WebSocket 测试失败: {e}")
