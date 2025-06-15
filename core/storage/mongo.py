@@ -1,69 +1,52 @@
-import asyncio
+import motor.motor_asyncio
 import logging
-import json
-from asyncio_mqtt import Client, MqttError
+import datetime
+import asyncio
 
-
-class MQTTClient:
+class MongoStorage:
     def __init__(self, config):
-        self.host = config.get("host", "localhost")
-        self.port = config.get("port", 1883)
-        self.username = config.get("username")
-        self.password = config.get("password")
-        self.keepalive = config.get("keepalive", 60)
-        self.logger = logging.getLogger("MQTTClient")
-        self._client = Client(
-            hostname=self.host,
-            port=self.port,
-            username=self.username,
-            password=self.password,
-            keepalive=self.keepalive,
-        )
-        self.reconnect_delay = config.get("reconnect_delay", 3)
+        self.logger = logging.getLogger("MongoStorage")
+        self.mongo_url = config.get("mongo_url", "mongodb://localhost:27017")
+        self.db_name = config.get("db_name", "virtual_devices")
+        self.client = None
+        self.db = None
 
-    async def connect(self, retries=5):
+    async def connect(self, retries=5, delay=3):
         for attempt in range(retries):
             try:
-                await self._client.connect()
-                self.logger.info("MQTT 连接成功")
+                self.client = motor.motor_asyncio.AsyncIOMotorClient(self.mongo_url)
+                await self.client.server_info()
+                self.db = self.client[self.db_name]
+                self.logger.info(f"连接 MongoDB 成功: {self.db_name}")
                 return
-            except MqttError as e:
-                self.logger.warning(f"MQTT 连接失败 (尝试 {attempt+1}/{retries}): {e}")
-                await asyncio.sleep(self.reconnect_delay)
-        raise RuntimeError("MQTT 重试连接失败")
+            except Exception as e:
+                self.logger.warning(f"MongoDB 连接失败 (尝试 {attempt+1}/{retries}): {e}")
+                await asyncio.sleep(delay)
+        raise RuntimeError("无法连接 MongoDB")
 
-    async def disconnect(self):
+    async def insert(self, did, device_type, data):
         try:
-            await self._client.disconnect()
-        except MqttError as e:
-            self.logger.warning(f"MQTT 断开失败: {e}")
+            collection = self.db[device_type]
+            doc = {
+                "did": did,
+                "device_type": device_type,
+                "timestamp": datetime.datetime.utcnow(),
+                "data": data
+            }
+            await collection.insert_one(doc)
+            self.logger.debug(f"写入 MongoDB: {did} => {data}")
+        except Exception as e:
+            self.logger.error(f"写入 MongoDB 失败: {e}")
 
-    async def publish(self, topic: str, payload, retain=False):
-        if isinstance(payload, dict):
-            payload = json.dumps(payload)
+    async def ensure_ttl_indexes(self, ttl_seconds: int = 86400):
         try:
-            await self._client.publish(topic, payload, retain=retain)
-        except MqttError as e:
-            self.logger.error(f"MQTT 发布失败: {e}")
-
-    async def subscribe(self, topic: str):
-        try:
-            await self._client.subscribe(topic)
-            self.logger.info(f"订阅主题: {topic}")
-        except MqttError as e:
-            self.logger.error(f"订阅失败: {e}")
-
-    def set_callback_handler(self, callback_coroutine):
-        self.callback = callback_coroutine
-
-    async def listen(self):
-        try:
-            async with self._client.unfiltered_messages() as messages:
-                async for msg in messages:
-                    try:
-                        if hasattr(self, 'callback'):
-                            await self.callback(msg.topic, msg.payload.decode())
-                    except Exception as e:
-                        self.logger.warning(f"消息处理异常: {e}")
-        except MqttError as e:
-            self.logger.error(f"MQTT 消息监听失败: {e}")
+            collections = await self.db.list_collection_names()
+            for name in collections:
+                await self.db[name].create_index(
+                    "timestamp",
+                    expireAfterSeconds=ttl_seconds,
+                    name="timestamp_ttl"
+                )
+                self.logger.info(f"设置 TTL 索引: {name}.timestamp ({ttl_seconds}秒)")
+        except Exception as e:
+            self.logger.error(f"设置 TTL 索引失败: {e}")
