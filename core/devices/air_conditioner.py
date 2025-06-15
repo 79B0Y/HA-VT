@@ -3,7 +3,6 @@ import random
 import logging
 import uuid
 
-
 class AirConditioner:
     def __init__(self, pid, did, mqtt_client, mongo, config):
         self.pid = pid
@@ -26,14 +25,13 @@ class AirConditioner:
         }
 
     async def run(self):
-        # 发送设备发现
-        self.publish_discovery()
+        await self.publish_discovery()
         await asyncio.sleep(1)
-        self.publish_availability("online")
+        await self.publish_availability("online")
 
         while self.running and not self.static:
             self.simulate_status()
-            self.publish_status()
+            await self.publish_status()
             await self.mongo.insert(self.did, "air_conditioner", self.state)
             await asyncio.sleep(self.update_interval)
 
@@ -74,10 +72,10 @@ class AirConditioner:
             "fan_mode_value_template": "{{ ['auto', 'low', 'medium', 'high'][value_json.ac_mark] }}",
             "mode_state_template": "{{ ['off','cool','heat','dry','fan_only'][value_json.ac_mode] if value_json.pwr else 'off' }}"
         }
-        await    self.mqtt.publish(topic, payload, retain=True)
+        await self.mqtt.publish(topic, payload, retain=True)
 
     async def publish_status(self):
-        await    self.mqtt.publish(f"home/{self.did}/status", self.state)
+        await self.mqtt.publish(f"home/{self.did}/status", self.state)
 
     async def publish_availability(self, status):
-        await    self.mqtt.publish(f"home/{self.did}/available", status)
+        await self.mqtt.publish(f"home/{self.did}/available", status)
