@@ -36,7 +36,7 @@ class Sensor:
         delta = random.uniform(-0.3, 0.3)
         self.value = round(min(max(self.value + delta, self.range[0]), self.range[1]), 1)
 
-    def publish_discovery(self):
+    async def publish_discovery(self):
         topic = f"homeassistant/sensor/{self.pid}/{self.did}/config"
         payload = {
             "unique_id": self.did,
@@ -55,8 +55,8 @@ class Sensor:
         }
         await self.mqtt.publish(topic, payload, retain=True)
 
-    def publish_status(self):
+    async def publish_status(self):
         await self.mqtt.publish(f"home/{self.did}/status", {"value": self.value})
 
-    def publish_availability(self, status):
+    async def publish_availability(self, status):
         await self.mqtt.publish(f"home/{self.did}/available", status)
