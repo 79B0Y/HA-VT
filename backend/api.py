@@ -25,21 +25,24 @@ MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.getenv("DB_NAME", "virtual_devices")
 LOG_PATH = Path(os.getenv("LOG_PATH", Path(__file__).parent.parent / "core" / "logs" / "simulator.log"))
 
-client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
+client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=1000)
 db = client[DB_NAME]
 
 
 @app.get("/api/devices")
 async def get_devices():
-    collections = await db.list_collection_names()
     result = []
-    for coll in collections:
-        async for doc in db[coll].find().sort("timestamp", -1).limit(5):
-            result.append({
-                "did": doc.get("did"),
-                "device_type": doc.get("device_type"),
-                "data": doc.get("data")
-            })
+    try:
+        collections = await db.list_collection_names()
+        for coll in collections:
+            async for doc in db[coll].find().sort("timestamp", -1).limit(5):
+                result.append({
+                    "did": doc.get("did"),
+                    "device_type": doc.get("device_type"),
+                    "data": doc.get("data")
+                })
+    except Exception as e:
+        print(f"读取设备列表失败: {e}")
     return result
 
 
