@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Node
+node_modules/
+dist/
+
+# Logs & env
+logs/
+.env
+
+# OS
+.DS_Store
+
+# Frontend cache
+frontend/.cache/
+frontend/.vite/
