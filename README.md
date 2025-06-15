@@ -23,7 +23,19 @@ virtual-device-simulator/
 ├── storage/                   # MongoDB 存储模块
 │   └── mongo.py
 ├── frontend/                  # 前端可视化仪表板（Vue 或 React）
-│   └── (Web项目目录)
+│   ├── public/                  # 静态资源
+│   ├── src/
+│   │   ├── assets/             # 图标、图片等
+│   │   ├── components/         # 公共组件（卡片、状态块）
+│   │   ├── pages/              # 页面（首页、设备总览、日志）
+│   │   ├── store/              # Pinia 状态管理
+│   │   ├── utils/              # 工具函数与接口封装
+│   │   ├── App.vue
+│   │   ├── main.ts
+│   │   └── router.ts
+│   ├── tailwind.config.js
+│   ├── index.html
+│   └── vite.config.ts
 ├── logs/                      # 日志目录
 │   └── simulator.log
 ├── requirements.txt           # Python依赖列表
@@ -191,6 +203,67 @@ devices:
     range: [18, 32]
     update_interval: 6
 ```
+
+# 前端仪表板概览（frontend/）
+
+本目录下为虚拟设备模拟系统的前端界面代码，推荐使用 Vue 3 + TailwindCSS + Pinia + Vite 构建。
+
+## 目录结构建议
+
+```bash
+frontend/
+├── public/                  # 静态资源
+├── src/
+│   ├── assets/             # 图标、图片等
+│   ├── components/         # 公共组件（卡片、状态块）
+│   ├── pages/              # 页面（首页、设备总览、日志）
+│   ├── store/              # Pinia 状态管理
+│   ├── utils/              # 工具函数与接口封装
+│   ├── App.vue
+│   ├── main.ts
+│   └── router.ts
+├── tailwind.config.js
+├── index.html
+└── vite.config.ts
+```
+
+## 功能模块规划
+
+| 页面             | 功能描述                                  |
+|------------------|---------------------------------------------|
+| 首页 Dashboard    | 展示设备总数、状态概览、连接状态、系统指标 |
+| 设备列表页面     | 分类型展示设备状态，支持搜索过滤            |
+| 日志页面         | 实时显示运行日志，支持级别筛选              |
+| 数据库状态页面   | MongoDB连接状态、写入频率、最新数据预览    |
+
+## 后端接口（示例）
+
+- `GET /api/devices`：返回所有设备状态
+- `GET /api/logs`：返回最新日志流
+- `GET /api/mongo/stats`：返回数据库连接信息
+- 使用 WebSocket 实现状态推送与设备刷新
+
+## 启动方式
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+生产构建：
+```bash
+npm run build
+```
+
+## 构建工具
+- Vue 3
+- TailwindCSS
+- Pinia
+- Vite
+- ECharts（可选，用于图表展示）
+
+
 
 ---
 
