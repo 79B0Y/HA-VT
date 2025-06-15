@@ -180,6 +180,7 @@ pytest test_websocket.py
 ```bash
 cd core
 source .venv/bin/activate
+pip install aiomqtt
 python main.py
 ```
 
