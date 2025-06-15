@@ -10,40 +10,50 @@
 
 ```
 virtual-device-simulator/
-├── config.yaml                 # 配置文件（MQTT、MongoDB、设备列表等）
-├── install.sh                 # 自动安装脚本
-├── main.py                    # 主程序入口
-├── devices/                   # 各类虚拟设备模拟模块
-│   ├── __init__.py
-│   ├── air_conditioner.py
-│   ├── light.py
-│   └── sensor.py
-├── mqtt/                      # MQTT 客户端封装
-│   └── client.py
-├── storage/                   # MongoDB 存储模块
-│   └── mongo.py
-├── frontend/                  # 前端可视化仪表板（Vue 或 React）
-│   ├── public/                  # 静态资源
-│   ├── src/
-│   │   ├── assets/             # 图标、图片等
-│   │   ├── components/         # 公共组件（卡片、状态块）
-│   │   ├── pages/              # 页面（首页、设备总览、日志）
-│   │   │    ├── Dashboard.vue 
-│   │   │    ├── Devices.vue
-│   │   │    ├── Logs.vue
-│   │   │    ├── MongoStats.vue
-│   │   ├── store/              # Pinia 状态管理
-│   │   ├── utils/              # 工具函数与接口封装
-│   │   ├── App.vue
-│   │   ├── main.ts
-│   │   └── router.ts
-│   ├── tailwind.config.js
+├── backend/                            # 后端 FastAPI 接口服务
+│   ├── api.py                          # FastAPI 应用入口
+│   ├── .env                            # MongoDB 配置
+│   ├── requirements.txt                # 后端依赖
+│   └── logs/                           # 后端日志（软链接或共享）
+│       └── simulator.log
+│
+├── core/                               # 主程序运行逻辑（设备模拟）
+│   ├── main.py                         # 启动主程序
+│   ├── config.yaml                     # 主配置文件
+│   ├── requirements.txt                # 主程序依赖
+│   ├── install.sh                      # 安装脚本
+│   ├── mqtt/                           # MQTT 客户端封装
+│   │   └── client.py
+│   ├── storage/                         # MongoDB 存储模块
+│   │   └── mongo.py
+│   ├── utils/
+│   │   └── config.py
+│   └── devices/                        # 各类虚拟设备模拟模块
+│       ├── __init__.py
+│       ├── air_conditioner.py
+│       ├── light.py
+│       └── sensor.py
+│
+├── frontend/                           # 前端仪表盘（Vue 3）
 │   ├── index.html
-│   └── vite.config.ts
-├── logs/                      # 日志目录
-│   └── simulator.log
-├── requirements.txt           # Python依赖列表
-└── docker-compose.yml         # 一键部署脚本
+│   ├── main.ts
+│   ├── App.vue
+│   ├── router.ts
+│   ├── assets/
+│   ├── pages/                          # 页面（首页、设备总览、日志）
+│   │   ├── Dashboard.vue
+│   │   ├── Devices.vue
+│   │   ├── Logs.vue
+│   │   └── MongoStats.vue
+│   ├── store/                          # Pinia 状态管理
+│   ├── utils/                          # 工具函数与接口封装
+│   ├── tailwind.config.js
+│   ├── vite.config.ts
+│   └── package.json
+│
+├── docker-compose.yml                  # 可选：统一部署入口
+└── README.md
+
 ```
 
 ---
