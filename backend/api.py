@@ -5,6 +5,7 @@ import os
 import motor.motor_asyncio
 from dotenv import load_dotenv
 from pathlib import Path
+from websocket_devices import router as ws_router
 
 app = FastAPI()
 
@@ -15,6 +16,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(ws_router)  # ✅ 注册 WebSocket 路由
 
 # 加载环境变量
 load_dotenv()
