@@ -163,11 +163,13 @@ pip install -r requirements-dev.txt
 
 ### ✅ 运行测试
 ```bash
+cd tests/
+
 # 运行 REST 接口测试
-pytest tests/test_api.py
+pytest test_api.py
 
 # 运行 WebSocket 推送测试（需运行中后端服务）
-pytest tests/test_websocket.py
+pytest test_websocket.py
 ```
 
 ---
