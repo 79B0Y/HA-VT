@@ -29,3 +29,16 @@ class MongoStorage:
             self.logger.debug(f"写入 MongoDB: {did} => {data}")
         except Exception as e:
             self.logger.error(f"写入 MongoDB 失败: {e}")
+
+    async def ensure_ttl_indexes(self, ttl_seconds: int = 86400):
+        try:
+            collections = await self.db.list_collection_names()
+            for name in collections:
+                await self.db[name].create_index(
+                    "timestamp",
+                    expireAfterSeconds=ttl_seconds,
+                    name="timestamp_ttl"
+                )
+                self.logger.info(f"设置 TTL 索引: {name}.timestamp ({ttl_seconds}秒)")
+        except Exception as e:
+            self.logger.error(f"设置 TTL 索引失败: {e}")
