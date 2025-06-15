@@ -189,6 +189,7 @@ uvicorn api:app --reload
 ### ✅ 启动前端开发服务（可选调试）
 ```bash
 cd frontend
+npm install vue-router@4
 npm run dev
 ```
 
