@@ -118,34 +118,89 @@ virtual-device-simulator/
 - 持久存储与错误追踪
 
 ---
+# 🚀 虚拟设备模拟系统使用说明
 
-## 🚀 安装与使用指南
+## 📦 安装方式
 
-### 1. 执行自动安装脚本
-
+### ✅ 安装主程序与依赖（Ubuntu）
 ```bash
-chmod +x install.sh
-./install.sh
+# 克隆仓库
+git clone https://github.com/your-org/virtual-device-simulator.git
+cd virtual-device-simulator
+
+# 安装 Python 主程序依赖（虚拟设备模拟器）
+cd core
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# 安装 MQTT Broker 与 MongoDB（如果尚未安装）
+sudo apt install mosquitto mongodb -y
 ```
 
-### 2. 注册系统服务（自启动）
-
+### ✅ 安装后端接口服务（FastAPI）
 ```bash
-sudo cp virtual-device-simulator.service /etc/systemd/system/
-sudo systemctl enable virtual-device-simulator.service
-sudo systemctl start virtual-device-simulator.service
+cd ../backend
+pip install -r requirements.txt
 ```
 
-### 3. 查看状态与日志
-
+### ✅ 安装前端仪表盘
 ```bash
-sudo systemctl status virtual-device-simulator.service
-tail -f logs/simulator.log
+cd ../frontend
+npm install
+npm run build
 ```
 
-### 4. Home Assistant 中自动发现
-- 设备将通过 `homeassistant/<component>/<pid>/<did>/config` 注册
-- 相关消息格式参见 `HA MQTT.md` 文档说明
+---
+
+## 🧪 测试方式
+
+### ✅ 安装测试依赖
+```bash
+pip install -r requirements-dev.txt
+```
+
+### ✅ 运行测试
+```bash
+# 运行 REST 接口测试
+pytest tests/test_api.py
+
+# 运行 WebSocket 推送测试（需运行中后端服务）
+pytest tests/test_websocket.py
+```
+
+---
+
+## 🚀 启动方式
+
+### ✅ 启动虚拟设备模拟器
+```bash
+cd core
+source .venv/bin/activate
+python main.py
+```
+
+### ✅ 启动 FastAPI 后端接口服务
+```bash
+cd backend
+uvicorn api:app --reload
+```
+
+### ✅ 启动前端开发服务（可选调试）
+```bash
+cd frontend
+npm run dev
+```
+
+---
+
+## 🌐 系统入口说明
+
+- 仪表盘访问地址：`http://localhost:5173`
+- 后端接口地址：`http://localhost:8000`
+- WebSocket 地址：`ws://localhost:8000/ws/devices`
+- 配置文件路径：`core/config.yaml`
+- 日志文件路径：`core/logs/simulator.log`
 
 ---
 
