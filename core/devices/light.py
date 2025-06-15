@@ -85,10 +85,10 @@ class Light:
                 "manufacturer": "Link&Link"
             }
         }
-        self.mqtt.publish(topic, payload, retain=True)
+    await self.mqtt.publish(topic, payload, retain=True)
 
     def publish_status(self):
-        self.mqtt.publish(f"home/{self.did}/status", self.state)
+    await self.mqtt.publish(f"home/{self.did}/status", self.state)
 
     def publish_availability(self, status):
-        self.mqtt.publish(f"home/{self.did}/available", status)
+    await self.mqtt.publish(f"home/{self.did}/available", status)
