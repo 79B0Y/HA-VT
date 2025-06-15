@@ -74,10 +74,10 @@ class AirConditioner:
             "fan_mode_value_template": "{{ ['auto', 'low', 'medium', 'high'][value_json.ac_mark] }}",
             "mode_state_template": "{{ ['off','cool','heat','dry','fan_only'][value_json.ac_mode] if value_json.pwr else 'off' }}"
         }
-        self.mqtt.publish(topic, payload, retain=True)
+    await    self.mqtt.publish(topic, payload, retain=True)
 
     def publish_status(self):
-        self.mqtt.publish(f"home/{self.did}/status", self.state)
+    await    self.mqtt.publish(f"home/{self.did}/status", self.state)
 
     def publish_availability(self, status):
-        self.mqtt.publish(f"home/{self.did}/available", status)
+    await    self.mqtt.publish(f"home/{self.did}/available", status)
