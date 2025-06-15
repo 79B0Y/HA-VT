@@ -1,6 +1,7 @@
 import motor.motor_asyncio
 import logging
 import datetime
+import asyncio
 
 
 class MongoStorage:
@@ -11,10 +12,18 @@ class MongoStorage:
         self.client = None
         self.db = None
 
-    async def connect(self):
-        self.client = motor.motor_asyncio.AsyncIOMotorClient(self.mongo_url)
-        self.db = self.client[self.db_name]
-        self.logger.info(f"连接 MongoDB 数据库: {self.db_name}")
+    async def connect(self, retries=5, delay=3):
+        for attempt in range(retries):
+            try:
+                self.client = motor.motor_asyncio.AsyncIOMotorClient(self.mongo_url)
+                await self.client.server_info()
+                self.db = self.client[self.db_name]
+                self.logger.info(f"连接 MongoDB 成功: {self.db_name}")
+                return
+            except Exception as e:
+                self.logger.warning(f"MongoDB 连接失败 (尝试 {attempt+1}/{retries}): {e}")
+                await asyncio.sleep(delay)
+        raise RuntimeError("无法连接 MongoDB")
 
     async def insert(self, did, device_type, data):
         try:
