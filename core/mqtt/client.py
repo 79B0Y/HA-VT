@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import json
-import paho.mqtt.client as mqtt
+from asyncio_mqtt import Client, MqttError
 
 
 class MQTTClient:
@@ -11,45 +11,48 @@ class MQTTClient:
         self.username = config.get("username")
         self.password = config.get("password")
         self.keepalive = config.get("keepalive", 60)
-
-        self.client = mqtt.Client()
         self.logger = logging.getLogger("MQTTClient")
-
-        if self.username:
-            self.client.username_pw_set(self.username, self.password)
-
-        self.client.on_connect = self.on_connect
-        self.client.on_disconnect = self.on_disconnect
-        self.client.on_message = self.on_message
+        self._client = Client(
+            hostname=self.host,
+            port=self.port,
+            username=self.username,
+            password=self.password,
+            keepalive=self.keepalive,
+        )
 
     async def connect(self):
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, self._connect_blocking)
-
-    def _connect_blocking(self):
-        self.client.connect(self.host, self.port, self.keepalive)
-        self.client.loop_start()
-
-    def on_connect(self, client, userdata, flags, rc):
-        if rc == 0:
+        try:
+            await self._client.connect()
             self.logger.info("MQTT 连接成功")
-        else:
-            self.logger.error(f"MQTT 连接失败，错误码: {rc}")
+        except MqttError as e:
+            self.logger.error(f"MQTT 连接失败: {e}")
 
-    def on_disconnect(self, client, userdata, rc):
-        self.logger.warning(f"MQTT 断开连接，错误码: {rc}")
+    async def disconnect(self):
+        await self._client.disconnect()
 
-    def on_message(self, client, userdata, msg):
-        self.logger.debug(f"收到消息: {msg.topic} -> {msg.payload.decode()}")
-
-    def publish(self, topic, payload, retain=False):
+    async def publish(self, topic: str, payload, retain=False):
         if isinstance(payload, dict):
             payload = json.dumps(payload)
-        self.client.publish(topic, payload, retain=retain)
+        try:
+            await self._client.publish(topic, payload, retain=retain)
+        except MqttError as e:
+            self.logger.error(f"MQTT 发布失败: {e}")
 
-    def subscribe(self, topic):
-        self.client.subscribe(topic)
+    async def subscribe(self, topic: str):
+        await self._client.subscribe(topic)
         self.logger.info(f"订阅主题: {topic}")
 
-    def set_message_callback(self, callback):
-        self.client.on_message = callback
+    def get_client(self):
+        return self._client
+
+    def set_callback_handler(self, callback_coroutine):
+        self.callback = callback_coroutine
+
+    async def listen(self):
+        async with self._client.unfiltered_messages() as messages:
+            async for msg in messages:
+                try:
+                    if hasattr(self, 'callback'):
+                        await self.callback(msg.topic, msg.payload.decode())
+                except Exception as e:
+                    self.logger.warning(f"MQTT 消息处理异常: {e}")
