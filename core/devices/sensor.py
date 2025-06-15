@@ -8,7 +8,7 @@ class Sensor:
         self.pid = pid
         self.did = did
         self.name = f"Sensor_{did}"
-        self.device_class = config.get("device_class", "temperature")  # temperature, humidity, motion, etc.
+        self.device_class = config.get("device_class", "temperature")
         self.range = config.get("range", [20, 30])
         self.unit = config.get("unit", "°C")
         self.update_interval = config.get("update_interval", 5)
@@ -18,17 +18,16 @@ class Sensor:
         self.mqtt = mqtt_client
         self.mongo = mongo
 
-        # 初始值
         self.value = random.uniform(self.range[0], self.range[1])
 
     async def run(self):
-        self.publish_discovery()
+        await self.publish_discovery()
         await asyncio.sleep(1)
-        self.publish_availability("online")
+        await self.publish_availability("online")
 
         while self.running and not self.static:
             self.simulate_status()
-            self.publish_status()
+            await self.publish_status()
             await self.mongo.insert(self.did, self.device_class, {"value": self.value})
             await asyncio.sleep(self.update_interval)
 
