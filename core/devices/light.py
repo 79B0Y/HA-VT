@@ -22,22 +22,21 @@ class Light:
             "red": random.randint(0, 255),
             "green": random.randint(0, 255),
             "blue": random.randint(0, 255),
-            "bulb_colormode": random.randint(0, 1)  # 0=RGB, 1=色温
+            "bulb_colormode": random.randint(0, 1)
         }
 
     async def run(self):
-        self.publish_discovery()
+        await self.publish_discovery()
         await asyncio.sleep(1)
-        self.publish_availability("online")
+        await self.publish_availability("online")
 
         while self.running and not self.static:
             self.simulate_status()
-            self.publish_status()
+            await self.publish_status()
             await self.mongo.insert(self.did, "light", self.state)
             await asyncio.sleep(self.update_interval)
 
     def simulate_status(self):
-        # 随机波动亮度、色温或颜色
         if self.state["bulb_colormode"] == 0:
             self.state["red"] = max(0, min(255, self.state["red"] + random.randint(-10, 10)))
             self.state["green"] = max(0, min(255, self.state["green"] + random.randint(-10, 10)))
@@ -57,27 +56,22 @@ class Light:
             "state_value_template": "{{ value_json.pwr }}",
             "payload_on": 1,
             "payload_off": 0,
-
             "brightness": True,
             "brightness_scale": 100,
             "brightness_state_topic": f"home/{self.did}/status",
             "brightness_command_topic": f"home/{self.did}/brightness/set",
             "brightness_value_template": "{{ value_json.brightness }}",
             "brightness_command_template": "{\"brightness\": {{value}},\"bulb_colormode\":1}",
-
             "color_mode_state_topic": f"home/{self.did}/status",
             "color_mode_value_template": "{{ 'rgb' if value_json.bulb_colormode == 0 else 'color_temp' }}",
-
             "color_temp_value_template": "{{ (1000000 / value_json.colortemp) | int }}",
             "color_temp_state_topic": f"home/{self.did}/status",
             "color_temp_command_template": "{\"colortemp\": {{(1000000 / value) | int}},\"bulb_colormode\":1}",
             "color_temp_command_topic": f"home/{self.did}/colortemp/set",
-
             "rgb_state_topic": f"home/{self.did}/status",
             "rgb_command_topic": f"home/{self.did}/rgb/set",
             "rgb_command_template": "{\"red\":{{red}},\"green\":{{green}},\"blue\":{{blue}},\"bulb_colormode\":0}",
             "rgb_value_template": "{{ value_json.red }},{{ value_json.green }},{{ value_json.blue }}",
-
             "device": {
                 "identifiers": [f"did_{self.did}"],
                 "name": self.name,
