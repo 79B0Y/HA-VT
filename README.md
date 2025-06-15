@@ -139,6 +139,46 @@ database:
 devices:
   air_conditioners:
     pid: 1101
+    auto_update:
+      count: 2           # 自动更新的设备数量
+      update_interval: 10
+    static:
+      count: 1           # 非自动更新（只注册不自动变化）的设备数量
+  lights:
+    pid: 1201
+    auto_update:
+      count: 5
+      update_interval: 5
+    static:
+      count: 2
+  temperature_sensors:
+    pid: 1301
+    auto_update:
+      count: 4
+      update_interval: 6
+      range: [18, 32]
+    static:
+      count: 2
+```
+
+### 🔧 DID 自动分配说明
+
+- 每个设备由程序自动分配唯一 `did`（设备ID），例如：`temp_0001`, `light_0003`。
+- DID 生成格式可基于：设备类型前缀 + 自增编号
+- 所有自动与静态设备的 `did` 均唯一，不重用
+mqtt:
+  host: "127.0.0.1"
+  port: 1883
+  username: "user"
+  password: "pass"
+
+database:
+  mongo_url: "mongodb://localhost:27017"
+  db_name: "virtual_devices"
+
+devices:
+  air_conditioners:
+    pid: 1101
     count: 2
     update_interval: 10
   lights:
