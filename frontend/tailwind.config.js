@@ -4,7 +4,11 @@ import defaultTheme from 'tailwindcss/defaultTheme'
 export default {
   content: [
     "./index.html",
-    "./**/*.{vue,ts,js,html}"
+    "./App.vue",
+    "./main.ts",
+    "./router.ts",
+    "./pages/**/*.{vue,ts,js,html}",
+    "./utils/**/*.{ts,js}"
   ],
   theme: {
     extend: {

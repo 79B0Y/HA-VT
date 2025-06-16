@@ -253,31 +253,7 @@ devices:
 - 每个设备由程序自动分配唯一 `did`（设备ID），例如：`temp_0001`, `light_0003`。
 - DID 生成格式可基于：设备类型前缀 + 自增编号
 - 所有自动与静态设备的 `did` 均唯一，不重用
-mqtt:
-  host: "127.0.0.1"
-  port: 1883
-  username: "user"
-  password: "pass"
 
-database:
-  mongo_url: "mongodb://localhost:27017"
-  db_name: "virtual_devices"
-
-devices:
-  air_conditioners:
-    pid: 1101
-    count: 2
-    update_interval: 10
-  lights:
-    pid: 1201
-    count: 5
-    update_interval: 5
-  temperature_sensors:
-    pid: 1301
-    count: 4
-    range: [18, 32]
-    update_interval: 6
-```
 
 # 前端仪表板概览（frontend/）
 

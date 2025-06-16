@@ -1,8 +1,8 @@
 import asyncio
 import random
 import logging
-import uuid
 import json
+
 
 class AirConditioner:
     def __init__(self, pid, did, mqtt_client, mongo, config):
@@ -78,7 +78,10 @@ class AirConditioner:
 
     def simulate_status(self):
         # 简单模拟状态变化
-        self.state["envtemp"] = round(self.state["envtemp"] + random.uniform(-0.5, 0.5), 1)
+        self.state["envtemp"] = round(
+            self.state["envtemp"] + random.uniform(-0.5, 0.5),
+            1,
+        )
 
     async def publish_discovery(self):
         topic = f"homeassistant/climate/{self.pid}/{self.did}/config"
@@ -110,8 +113,13 @@ class AirConditioner:
             "fan_modes": ["auto", "low", "medium", "high"],
             "value_template": "{{ value_json.temp }}",
             "current_temperature_template": "{{ value_json.envtemp }}",
-            "fan_mode_value_template": "{{ ['auto', 'low', 'medium', 'high'][value_json.ac_mark] }}",
-            "mode_state_template": "{{ ['off','cool','heat','dry','fan_only'][value_json.ac_mode] if value_json.pwr else 'off' }}"
+            "fan_mode_value_template": (
+                "{{ ['auto', 'low', 'medium', 'high'][value_json.ac_mark] }}"
+            ),
+            "mode_state_template": (
+                "{{ ['off','cool','heat','dry','fan_only'][value_json.ac_mode]"
+                " if value_json.pwr else 'off' }}"
+            )
         }
         await self.mqtt.publish(topic, payload, retain=True)
 

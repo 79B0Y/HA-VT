@@ -21,7 +21,16 @@ def load_devices_from_config(devices_config, mqtt_client, mongo):
                 did = make_did()
                 config = dict(auto_cfg)
                 config["static"] = False
-                devices.append(create_device(dev_type, pid, did, mqtt_client, mongo, config))
+                devices.append(
+                    create_device(
+                        dev_type,
+                        pid,
+                        did,
+                        mqtt_client,
+                        mongo,
+                        config,
+                    )
+                )
 
         # 静态设备
         if "static" in cfg:
@@ -30,7 +39,16 @@ def load_devices_from_config(devices_config, mqtt_client, mongo):
                 did = make_did()
                 config = dict(static_cfg)
                 config["static"] = True
-                devices.append(create_device(dev_type, pid, did, mqtt_client, mongo, config))
+                devices.append(
+                    create_device(
+                        dev_type,
+                        pid,
+                        did,
+                        mqtt_client,
+                        mongo,
+                        config,
+                    )
+                )
 
     return devices
 
@@ -47,7 +65,10 @@ def create_device(dev_type, pid, did, mqtt_client, mongo, config):
             "motion_sensors": "motion",
         }
         config["device_class"] = device_class_map.get(dev_type, "temperature")
-        config.setdefault("unit", "°C" if config["device_class"] == "temperature" else "%")
+        config.setdefault(
+            "unit",
+            "°C" if config["device_class"] == "temperature" else "%",
+        )
         return Sensor(pid, did, mqtt_client, mongo, config)
     else:
         raise ValueError(f"未知的设备类型: {dev_type}")
