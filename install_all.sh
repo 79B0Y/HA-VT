@@ -9,7 +9,7 @@ cd "$ROOT_DIR"
 echo "🔧 安装系统依赖..."
 sudo apt-get update
 # 安装 MongoDB、Mosquitto、Node.js 及 npm，如果尚未安装
-sudo apt-get install -y mongodb mosquitto mosquitto-clients nodejs npm python3-venv
+sudo apt-get install -y mosquitto-clients nodejs npm python3-venv
 
 # 安装核心程序并配置 systemd 服务
 cd core
