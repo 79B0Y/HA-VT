@@ -61,14 +61,14 @@ class MQTTClient:
                     async for msg in messages:
                         try:
                             if self.callback:
-                                await self.callback(msg.topic, msg.payload.decode())
+                                await self.callback(str(msg.topic), msg.payload.decode())
                         except Exception as e:
                             self.logger.warning(f"MQTT 消息处理异常: {e}")
             else:
                 async for msg in self.client.messages:
                     try:
                         if self.callback:
-                            await self.callback(msg.topic, msg.payload.decode())
+                            await self.callback(str(msg.topic), msg.payload.decode())
                     except Exception as e:
                         self.logger.warning(f"MQTT 消息处理异常: {e}")
         except MqttError as e:
