@@ -163,7 +163,7 @@ pip install -r requirements-dev.txt
 
 ### ✅ 运行测试
 ```bash
-cd tests/
+cd test/
 
 # 运行 REST 接口测试
 pytest test_api.py
