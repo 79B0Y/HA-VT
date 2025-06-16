@@ -180,6 +180,7 @@ pytest test_websocket.py
 cd ../core
 source .venv/bin/activate
 pip install aiomqtt
+mkdir -p logs
 nano config.yaml
 python main.py
 ```
