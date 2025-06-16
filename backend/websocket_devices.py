@@ -3,7 +3,7 @@ import asyncio
 import motor.motor_asyncio
 from dotenv import load_dotenv
 import os
-import datetime
+
 
 router = APIRouter()
 
@@ -12,6 +12,7 @@ MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.getenv("DB_NAME", "virtual_devices")
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
+
 
 @router.websocket("/ws/devices")
 async def websocket_device_updates(websocket: WebSocket):

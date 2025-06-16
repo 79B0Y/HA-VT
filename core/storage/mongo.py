@@ -3,6 +3,7 @@ import logging
 import datetime
 import asyncio
 
+
 class MongoStorage:
     def __init__(self, config):
         self.logger = logging.getLogger("MongoStorage")
@@ -14,13 +15,17 @@ class MongoStorage:
     async def connect(self, retries=5, delay=3):
         for attempt in range(retries):
             try:
-                self.client = motor.motor_asyncio.AsyncIOMotorClient(self.mongo_url)
+                self.client = motor.motor_asyncio.AsyncIOMotorClient(
+                    self.mongo_url
+                )
                 await self.client.server_info()
                 self.db = self.client[self.db_name]
                 self.logger.info(f"连接 MongoDB 成功: {self.db_name}")
                 return
             except Exception as e:
-                self.logger.warning(f"MongoDB 连接失败 (尝试 {attempt+1}/{retries}): {e}")
+                self.logger.warning(
+                    f"MongoDB 连接失败 (尝试 {attempt + 1}/{retries}): {e}"
+                )
                 await asyncio.sleep(delay)
         raise RuntimeError("无法连接 MongoDB")
 
@@ -47,6 +52,8 @@ class MongoStorage:
                     expireAfterSeconds=ttl_seconds,
                     name="timestamp_ttl"
                 )
-                self.logger.info(f"设置 TTL 索引: {name}.timestamp ({ttl_seconds}秒)")
+                self.logger.info(
+                    f"设置 TTL 索引: {name}.timestamp ({ttl_seconds}秒)"
+                )
         except Exception as e:
             self.logger.error(f"设置 TTL 索引失败: {e}")
