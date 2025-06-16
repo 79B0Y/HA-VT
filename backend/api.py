@@ -23,9 +23,16 @@ app.include_router(ws_router)  # ✅ 注册 WebSocket 路由
 load_dotenv()
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.getenv("DB_NAME", "virtual_devices")
-LOG_PATH = Path(os.getenv("LOG_PATH", Path(__file__).parent.parent / "core" / "logs" / "simulator.log"))
+LOG_PATH = Path(
+    os.getenv(
+        "LOG_PATH",
+        Path(__file__).parent.parent / "core" / "logs" / "simulator.log",
+    )
+)
 
-client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=1000)
+client = motor.motor_asyncio.AsyncIOMotorClient(
+    MONGO_URL, serverSelectionTimeoutMS=1000
+)
 db = client[DB_NAME]
 
 
