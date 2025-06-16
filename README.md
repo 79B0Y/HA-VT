@@ -158,7 +158,6 @@ npm run build
 
 ### ✅ 安装测试依赖
 ```bash
-cd ../test
 pip install -r requirements-dev.txt
 ```
 
