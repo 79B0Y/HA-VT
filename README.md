@@ -179,7 +179,7 @@ pytest test_websocket.py
 ```bash
 cd ../core
 source .venv/bin/activate
-pip install aiomqtt
+pip install -r requirements.txt  # 安装依赖（包含 aiomqtt）
 mkdir -p logs
 nano config.yaml
 python main.py
