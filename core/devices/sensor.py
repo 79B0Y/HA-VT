@@ -1,6 +1,7 @@
 import asyncio
 import random
 import logging
+import json
 
 
 class Sensor:
@@ -19,6 +20,19 @@ class Sensor:
         self.mongo = mongo
 
         self.value = random.uniform(self.range[0], self.range[1])
+
+    def subscribe_topic(self):
+        return f"home/{self.did}/set"
+
+    async def handle_command(self, topic: str, payload: str):
+        try:
+            data = json.loads(payload)
+        except Exception:
+            data = payload
+        if isinstance(data, dict) and "value" in data:
+            self.value = float(data["value"])
+        elif isinstance(data, (int, float)) or str(data).replace('.', '', 1).isdigit():
+            self.value = float(data)
 
     async def run(self):
         await self.publish_discovery()

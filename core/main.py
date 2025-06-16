@@ -36,8 +36,27 @@ async def main():
     devices = load_devices_from_config(config["devices"], mqtt_client, mongo)
     logger.info(f"加载设备数量: {len(devices)}")
 
+    # 订阅设备指令主题
+    device_map = {d.did: d for d in devices}
+    for device in devices:
+        topic = getattr(device, "subscribe_topic", lambda: None)()
+        if topic:
+            await mqtt_client.subscribe(topic)
+
+    async def on_msg(topic, payload):
+        parts = topic.split('/')
+        if len(parts) >= 2:
+            did = parts[1]
+            dev = device_map.get(did)
+            if dev and hasattr(dev, "handle_command"):
+                await dev.handle_command(topic, payload)
+
+    mqtt_client.set_callback_handler(on_msg)
+    listener_task = asyncio.create_task(mqtt_client.listen())
+
     # 启动所有设备
     tasks = [device.run() for device in devices]
+    tasks.append(listener_task)
     await asyncio.gather(*tasks)
 
 
