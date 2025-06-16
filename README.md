@@ -132,7 +132,6 @@ cd virtual-device-simulator
 cd core
 python3 -m venv .venv
 source .venv/bin/activate
-mkdir -p /home/ll/HA-VT/core/logs
 pip install -r requirements.txt
 
 # 安装 MQTT Broker 与 MongoDB（如果尚未安装）
@@ -181,6 +180,7 @@ pytest test_websocket.py
 cd ../core
 source .venv/bin/activate
 pip install aiomqtt
+nano config.yaml
 python main.py
 ```
 
