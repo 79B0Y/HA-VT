@@ -178,7 +178,7 @@ pytest test_websocket.py
 
 ### ✅ 启动虚拟设备模拟器
 ```bash
-cd core
+cd ../core
 source .venv/bin/activate
 pip install aiomqtt
 python main.py
