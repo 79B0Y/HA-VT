@@ -14,8 +14,8 @@ virtual-device-simulator/
 │   ├── api.py                          # FastAPI 应用入口
 │   ├── .env                            # MongoDB 配置
 │   ├── requirements.txt                # 后端依赖
-│   └── logs/                           # 后端日志（软链接或共享）
-│       └── simulator.log
+│   └── logs/ -> ../core/logs/          # 后端日志（软链接或共享）
+│       └── simulator.log (../core/logs/simulator.log)
 │
 ├── core/                               # 主程序运行逻辑（设备模拟）
 │   ├── main.py                         # 启动主程序
@@ -182,7 +182,7 @@ source .venv/bin/activate
 pip install -r requirements.txt  # 安装依赖（包含 aiomqtt）
 mkdir -p logs
 nano config.yaml
-python main.py
+python main.py  # 首次运行会自动创建 logs 目录
 ```
 
 ### ✅ 启动 FastAPI 后端接口服务
