@@ -9,12 +9,13 @@ from utils.config import load_config
 
 async def main():
     # 初始化日志
-    Path("logs").mkdir(parents=True, exist_ok=True)
+    log_dir = Path(__file__).resolve().parent / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s [%(levelname)s] %(message)s',
         handlers=[
-            logging.FileHandler("logs/simulator.log"),
+            logging.FileHandler(log_dir / "simulator.log"),
             logging.StreamHandler()
         ]
     )

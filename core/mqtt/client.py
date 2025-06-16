@@ -56,8 +56,16 @@ class MQTTClient:
 
     async def listen(self):
         try:
-            async with self.client.unfiltered_messages() as messages:
-                async for msg in messages:
+            if hasattr(self.client, "unfiltered_messages"):
+                async with self.client.unfiltered_messages() as messages:
+                    async for msg in messages:
+                        try:
+                            if self.callback:
+                                await self.callback(msg.topic, msg.payload.decode())
+                        except Exception as e:
+                            self.logger.warning(f"MQTT 消息处理异常: {e}")
+            else:
+                async for msg in self.client.messages:
                     try:
                         if self.callback:
                             await self.callback(msg.topic, msg.payload.decode())
