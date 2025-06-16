@@ -122,7 +122,14 @@ virtual-device-simulator/
 
 ## 📦 安装方式
 
-### ✅ 安装主程序与依赖（Ubuntu）
+### ✅ 一键安装
+```bash
+./install_all.sh
+```
+脚本会自动安装系统依赖、配置 Python 虚拟环境并构建前端，随后创建并启动
+`virtual-device-simulator.service` systemd 服务。
+
+### ✅ 手动安装主程序与依赖（Ubuntu）
 ```bash
 # 克隆仓库
 git clone https://github.com/your-org/virtual-device-simulator.git
