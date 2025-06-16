@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from pathlib import Path
 from mqtt.client import MQTTClient
 from storage.mongo import MongoStorage
 from devices import load_devices_from_config
@@ -8,11 +9,13 @@ from utils.config import load_config
 
 async def main():
     # 初始化日志
+    log_dir = Path(__file__).resolve().parent / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s [%(levelname)s] %(message)s',
         handlers=[
-            logging.FileHandler("logs/simulator.log"),
+            logging.FileHandler(log_dir / "simulator.log"),
             logging.StreamHandler()
         ]
     )
