@@ -186,13 +186,13 @@ python main.py
 
 ### ✅ 启动 FastAPI 后端接口服务
 ```bash
-cd backend
+cd ../backend
 uvicorn api:app --reload
 ```
 
 ### ✅ 启动前端开发服务（可选调试）
 ```bash
-cd frontend
+cd ../frontend
 npm install vue-router@4
 npm run dev
 ```
