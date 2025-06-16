@@ -60,6 +60,7 @@ class MQTTClient:
                     async for msg in messages:
                         try:
                             if self.callback:
+
                                 await self.callback(
                                     msg.topic,
                                     msg.payload.decode(),
