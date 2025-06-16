@@ -62,7 +62,7 @@ class MQTTClient:
                             if self.callback:
 
                                 await self.callback(
-                                    msg.topic,
+                                    str(msg.topic),
                                     msg.payload.decode(),
                                 )
                                 
@@ -74,7 +74,7 @@ class MQTTClient:
                         if self.callback:
 
                             await self.callback(
-                                msg.topic,
+                                str(msg.topic),
                                 msg.payload.decode(),
                             )
 
