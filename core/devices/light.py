@@ -64,6 +64,8 @@ class Light:
         await self.publish_discovery()
         await asyncio.sleep(1)
         await self.publish_availability("online")
+        await self.publish_status()
+        await self.mongo.insert(self.did, "light", self.state)
 
         while self.running and not self.static:
             self.simulate_status()

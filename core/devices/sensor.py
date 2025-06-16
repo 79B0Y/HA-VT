@@ -38,6 +38,8 @@ class Sensor:
         await self.publish_discovery()
         await asyncio.sleep(1)
         await self.publish_availability("online")
+        await self.publish_status()
+        await self.mongo.insert(self.did, self.device_class, {"value": self.value})
 
         while self.running and not self.static:
             self.simulate_status()
