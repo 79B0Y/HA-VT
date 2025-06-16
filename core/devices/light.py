@@ -37,7 +37,15 @@ class Light:
             data = payload
 
         if isinstance(data, dict):
-            for key in ["pwr", "brightness", "colortemp", "red", "green", "blue", "bulb_colormode"]:
+            for key in [
+                "pwr",
+                "brightness",
+                "colortemp",
+                "red",
+                "green",
+                "blue",
+                "bulb_colormode",
+            ]:
                 if key in data:
                     self.state[key] = int(data[key])
             return
@@ -73,12 +81,30 @@ class Light:
 
     def simulate_status(self):
         if self.state["bulb_colormode"] == 0:
-            self.state["red"] = max(0, min(255, self.state["red"] + random.randint(-10, 10)))
-            self.state["green"] = max(0, min(255, self.state["green"] + random.randint(-10, 10)))
-            self.state["blue"] = max(0, min(255, self.state["blue"] + random.randint(-10, 10)))
+            self.state["red"] = max(
+                0,
+                min(255, self.state["red"] + random.randint(-10, 10)),
+            )
+            self.state["green"] = max(
+                0,
+                min(255, self.state["green"] + random.randint(-10, 10)),
+            )
+            self.state["blue"] = max(
+                0,
+                min(255, self.state["blue"] + random.randint(-10, 10)),
+            )
         else:
-            self.state["colortemp"] = max(2500, min(6500, self.state["colortemp"] + random.randint(-200, 200)))
-        self.state["brightness"] = max(0, min(100, self.state["brightness"] + random.randint(-5, 5)))
+            self.state["colortemp"] = max(
+                2500,
+                min(
+                    6500,
+                    self.state["colortemp"] + random.randint(-200, 200),
+                ),
+            )
+        self.state["brightness"] = max(
+            0,
+            min(100, self.state["brightness"] + random.randint(-5, 5)),
+        )
 
     async def publish_discovery(self):
         topic = f"homeassistant/light/{self.pid}/{self.did}/config"
@@ -96,17 +122,33 @@ class Light:
             "brightness_state_topic": f"home/{self.did}/status",
             "brightness_command_topic": f"home/{self.did}/brightness/set",
             "brightness_value_template": "{{ value_json.brightness }}",
-            "brightness_command_template": "{\"brightness\": {{value}},\"bulb_colormode\":1}",
+            "brightness_command_template": (
+                "{\"brightness\": {{value}},\"bulb_colormode\":1}"
+            ),
             "color_mode_state_topic": f"home/{self.did}/status",
-            "color_mode_value_template": "{{ 'rgb' if value_json.bulb_colormode == 0 else 'color_temp' }}",
-            "color_temp_value_template": "{{ (1000000 / value_json.colortemp) | int }}",
+            "color_mode_value_template": (
+                "{{ 'rgb' if value_json.bulb_colormode == 0 "
+                "else 'color_temp' }}"
+            ),
+            "color_temp_value_template": (
+                "{{ (1000000 / value_json.colortemp) | int }}"
+            ),
             "color_temp_state_topic": f"home/{self.did}/status",
-            "color_temp_command_template": "{\"colortemp\": {{(1000000 / value) | int}},\"bulb_colormode\":1}",
+            "color_temp_command_template": (
+                "{\"colortemp\": {{(1000000 / value) | int}},"
+                "\"bulb_colormode\":1}"
+            ),
             "color_temp_command_topic": f"home/{self.did}/colortemp/set",
             "rgb_state_topic": f"home/{self.did}/status",
             "rgb_command_topic": f"home/{self.did}/rgb/set",
-            "rgb_command_template": "{\"red\":{{red}},\"green\":{{green}},\"blue\":{{blue}},\"bulb_colormode\":0}",
-            "rgb_value_template": "{{ value_json.red }},{{ value_json.green }},{{ value_json.blue }}",
+            "rgb_command_template": (
+                "{\"red\":{{red}},\"green\":{{green}},"
+                "\"blue\":{{blue}},\"bulb_colormode\":0}"
+            ),
+            "rgb_value_template": (
+                "{{ value_json.red }},{{ value_json.green }},"
+                "{{ value_json.blue }}"
+            ),
             "device": {
                 "identifiers": [f"did_{self.did}"],
                 "name": self.name,

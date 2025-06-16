@@ -31,7 +31,10 @@ class Sensor:
             data = payload
         if isinstance(data, dict) and "value" in data:
             self.value = float(data["value"])
-        elif isinstance(data, (int, float)) or str(data).replace('.', '', 1).isdigit():
+        elif (
+            isinstance(data, (int, float))
+            or str(data).replace(".", "", 1).isdigit()
+        ):
             self.value = float(data)
 
     async def run(self):
@@ -42,12 +45,19 @@ class Sensor:
         while self.running and not self.static:
             self.simulate_status()
             await self.publish_status()
-            await self.mongo.insert(self.did, self.device_class, {"value": self.value})
+            await self.mongo.insert(
+                self.did,
+                self.device_class,
+                {"value": self.value},
+            )
             await asyncio.sleep(self.update_interval)
 
     def simulate_status(self):
         delta = random.uniform(-0.3, 0.3)
-        self.value = round(min(max(self.value + delta, self.range[0]), self.range[1]), 1)
+        self.value = round(
+            min(max(self.value + delta, self.range[0]), self.range[1]),
+            1,
+        )
 
     async def publish_discovery(self):
         topic = f"homeassistant/sensor/{self.pid}/{self.did}/config"
@@ -69,7 +79,10 @@ class Sensor:
         await self.mqtt.publish(topic, payload, retain=True)
 
     async def publish_status(self):
-        await self.mqtt.publish(f"home/{self.did}/status", {"value": self.value})
+        await self.mqtt.publish(
+            f"home/{self.did}/status",
+            {"value": self.value},
+        )
 
     async def publish_availability(self, status):
         await self.mqtt.publish(f"home/{self.did}/available", status)
