@@ -1,6 +1,7 @@
 import asyncio
 import random
 import logging
+import json
 
 
 class Light:
@@ -24,6 +25,40 @@ class Light:
             "blue": random.randint(0, 255),
             "bulb_colormode": random.randint(0, 1)
         }
+
+    def subscribe_topic(self):
+        return f"home/{self.did}/#"
+
+    async def handle_command(self, topic: str, payload: str):
+        sub = '/'.join(topic.split('/')[2:])
+        try:
+            data = json.loads(payload)
+        except Exception:
+            data = payload
+
+        if isinstance(data, dict):
+            for key in ["pwr", "brightness", "colortemp", "red", "green", "blue", "bulb_colormode"]:
+                if key in data:
+                    self.state[key] = int(data[key])
+            return
+
+        if sub == 'switch' and str(data).isdigit():
+            self.state['pwr'] = int(data)
+        elif sub == 'brightness/set' and str(data).isdigit():
+            self.state['brightness'] = int(data)
+            self.state['bulb_colormode'] = 1
+        elif sub == 'colortemp/set' and str(data).isdigit():
+            self.state['colortemp'] = int(data)
+            self.state['bulb_colormode'] = 1
+        elif sub == 'rgb/set' and isinstance(data, str):
+            try:
+                r, g, b = [int(x) for x in data.split(',')[:3]]
+                self.state['red'] = r
+                self.state['green'] = g
+                self.state['blue'] = b
+                self.state['bulb_colormode'] = 0
+            except Exception:
+                pass
 
     async def run(self):
         await self.publish_discovery()

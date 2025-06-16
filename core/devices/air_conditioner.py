@@ -2,6 +2,7 @@ import asyncio
 import random
 import logging
 import uuid
+import json
 
 class AirConditioner:
     def __init__(self, pid, did, mqtt_client, mongo, config):
@@ -23,6 +24,44 @@ class AirConditioner:
             "ac_mark": random.randint(0, 3),
             "envtemp": random.uniform(20, 30)
         }
+
+    def subscribe_topic(self):
+        """返回需要订阅的主题"""
+        return f"home/{self.did}/#"
+
+    async def handle_command(self, topic: str, payload: str):
+        """处理来自 MQTT 的控制指令"""
+        sub = '/'.join(topic.split('/')[2:])  # remove 'home/<did>/'
+        try:
+            data = json.loads(payload)
+        except Exception:
+            data = payload
+
+        if sub == 'set':
+            if isinstance(data, dict):
+                for key in ["pwr", "temp", "ac_mode", "ac_mark"]:
+                    if key in data:
+                        self.state[key] = int(data[key])
+            elif str(data).isdigit():
+                self.state["pwr"] = int(data)
+        elif sub == 'set/temp':
+            if str(data).isdigit():
+                self.state["temp"] = int(data)
+        elif sub == 'set/fan':
+            mapping = {'auto': 0, 'low': 1, 'medium': 2, 'high': 3}
+            if isinstance(data, str) and data in mapping:
+                self.state["ac_mark"] = mapping[data]
+            elif str(data).isdigit():
+                self.state["ac_mark"] = int(data)
+        elif sub == 'set/mode':
+            mapping = {'off': 0, 'cool': 1, 'heat': 2, 'dry': 3, 'fan_only': 4}
+            if isinstance(data, str) and data in mapping:
+                self.state["ac_mode"] = mapping[data]
+                self.state["pwr"] = 0 if mapping[data] == 0 else 1
+            elif str(data).isdigit():
+                val = int(data)
+                self.state["ac_mode"] = val
+                self.state["pwr"] = 0 if val == 0 else 1
 
     async def run(self):
         await self.publish_discovery()
